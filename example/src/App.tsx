@@ -1,18 +1,26 @@
 import * as React from 'react';
 
-import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'react-native-date-picker';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import DateRangePicker from 'react-native-date-picker';
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
-
-  React.useEffect(() => {
-    multiply(3, 7).then(setResult);
-  }, []);
-
+  const [dateSelected, setDateSelected] = React.useState();
+  const [timeInit, setTimeInit] = React.useState<any>();
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Text>Result:</Text>
+      <TouchableOpacity
+        onPress={() =>
+          setTimeInit({ id: 5, key: '14days_ago', name: '14 ngày qua' })
+        }
+      >
+        <Text>SettimeInit</Text>
+      </TouchableOpacity>
+      <DateRangePicker
+        timeInit={timeInit}
+        {...{ dateSelected, setDateSelected }}
+        types="both"
+      />
     </View>
   );
 }
