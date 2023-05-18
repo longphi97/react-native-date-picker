@@ -72,51 +72,41 @@ export const convertMarkedDates = (startDate: any, endDate: any) => {
   if (!startDate) {
     return {};
   }
-  if (!endDate) {
-    return {
-      [startDate]: {
-        color: START_NODE_COLOR,
-        startingDay: true,
-        endingDay: true,
-        textColor: 'white',
-      },
-    };
-  }
-  if (moment(startDate).isSame(endDate)) {
-    return {
-      [startDate]: {
-        color: START_NODE_COLOR,
-        startingDay: true,
-        endingDay: true,
 
-        textColor: 'white',
-      },
-    };
-  }
-  let nextStartDate: any = addDate(startDate, 1, 'days');
   const middleDateStyle = { color: MIDDLE_COLOR, textColor: 'white' };
-  let markedDates: any = {
+  const markedDates: any = {
     [startDate]: {
       color: START_NODE_COLOR,
       startingDay: Platform.OS === 'ios',
-
-      textColor: 'white',
-    },
-
-    [endDate]: {
-      // selected: true,
-      endingDay: Platform.OS === 'ios',
-
-      color: END_NODE_COLOR,
       textColor: 'white',
     },
   };
+
+  if (!endDate) {
+    markedDates[startDate].endingDay = true;
+    return markedDates;
+  }
+
+  if (moment(startDate).isSame(endDate)) {
+    markedDates[startDate].endingDay = true;
+    return markedDates;
+  }
+
+  let nextStartDate: any = addDate(startDate, 1, 'days');
+  markedDates[endDate] = {
+    endingDay: Platform.OS === 'ios',
+    color: END_NODE_COLOR,
+    textColor: 'white',
+  };
+
   while (moment(nextStartDate).isBetween(startDate, endDate)) {
-    markedDates = { ...markedDates, [nextStartDate]: middleDateStyle };
+    markedDates[nextStartDate] = middleDateStyle;
     nextStartDate = addDate(nextStartDate, 1, 'days');
   }
+
   return markedDates;
 };
+
 export const addDate = (day: any, number: number | string, type: any) => {
   if (!day) {
     return;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo, useMemo } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { CalendarList, LocaleConfig } from 'react-native-calendars';
 import moment from 'moment-timezone';
@@ -47,87 +47,87 @@ function PickerTimeField({
   );
 }
 
-function CalenderListCustom({
-  maxDate,
-  getDate,
-  minDate = '01/01/2020',
-  timeSelected = {},
-  currentDate,
-  data,
-  futureScrollRange,
-}: any) {
-  LocaleConfig.locales.en = LocaleConfig.locales[''];
-  LocaleConfig.locales.vi = getLocalConfig();
-  LocaleConfig.defaultLocale = 'vi';
-  const [startDate, setStartDate] = useState<any>(
-    formatDate(timeSelected?.fromDate) || null
-  );
-  const [endDate, setEndDate] = useState(
-    formatDate(timeSelected?.toDate) || null
-  );
+const CalenderListCustom = memo(
+  ({
+    maxDate,
+    getDate,
+    minDate = '01/01/2020',
+    timeSelected = {},
+    currentDate,
+    futureScrollRange,
+  }: any) => {
+    LocaleConfig.locales.en = LocaleConfig.locales[''];
+    LocaleConfig.locales.vi = getLocalConfig();
+    LocaleConfig.defaultLocale = 'vi';
+    const [startDate, setStartDate] = useState<any>(
+      formatDate(timeSelected?.fromDate) || null
+    );
+    const [endDate, setEndDate] = useState(
+      formatDate(timeSelected?.toDate) || null
+    );
 
-  const onDayPress = (day: any) => {
-    if (!startDate) {
-      setStartDate(day);
-    } else {
-      if (moment(startDate).isSame(day)) {
-        setStartDate(null);
-        setEndDate(null);
-      } else if (endDate && moment(endDate).isSame(day)) {
-        setEndDate(null);
+    const onDayPress = (day: any) => {
+      if (!startDate) {
+        setStartDate(day);
       } else {
-        if (moment(startDate).isBefore(day)) {
-          setEndDate(day);
+        if (moment(startDate).isSame(day)) {
+          setStartDate(null);
+          setEndDate(null);
+        } else if (endDate && moment(endDate).isSame(day)) {
+          setEndDate(null);
         } else {
-          setEndDate(startDate);
-          setStartDate(day);
+          if (moment(startDate).isBefore(day)) {
+            setEndDate(day);
+          } else {
+            setEndDate(startDate);
+            setStartDate(day);
+          }
         }
       }
-    }
-  };
-  useEffect(() => {
-    if (startDate && endDate) {
-      const formatStartDate = formatDateToDisplay(startDate);
-      const formatEndDate = formatDateToDisplay(endDate);
-      getDate({
-        fromDate: formatStartDate,
-        toDate: formatEndDate,
-        rangeDates: `${formatStartDate} - ${formatEndDate}`,
-      });
-    }
-    if (startDate && endDate === null) {
-      const formatStartDate = formatDateToDisplay(startDate);
-      getDate({
-        fromDate: formatStartDate,
-        toDate: formatStartDate,
-        rangeDates: `${formatStartDate} - ${formatStartDate}`,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startDate, endDate]);
+    };
+    useEffect(() => {
+      if (startDate && endDate) {
+        const formatStartDate = formatDateToDisplay(startDate);
+        const formatEndDate = formatDateToDisplay(endDate);
+        getDate({
+          fromDate: formatStartDate,
+          toDate: formatEndDate,
+          rangeDates: `${formatStartDate} - ${formatEndDate}`,
+        });
+      }
+      if (startDate && endDate === null) {
+        const formatStartDate = formatDateToDisplay(startDate);
+        getDate({
+          fromDate: formatStartDate,
+          toDate: formatStartDate,
+          rangeDates: `${formatStartDate} - ${formatStartDate}`,
+        });
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [startDate, endDate]);
 
-  // const newMaxDate = getMaxDate(startDate, maxDate);
-  const markedDates = convertMarkedDates(startDate, endDate);
-  const pastScrollRange =
-    moment().diff(moment(minDate, 'DD/MM/YYYY'), 'M') + 12;
+    // const newMaxDate = getMaxDate(startDate, maxDate);
+    const markedDates = convertMarkedDates(startDate, endDate);
+    const pastScrollRange = useMemo(() => {
+      return moment().diff(moment(minDate, 'DD/MM/YYYY'), 'M') + 12;
+    }, [minDate]);
 
-  return (
-    <CalendarList
-      keyExtractor={(date, index) => `${date}` + index}
-      extraData={data}
-      current={formatDate(currentDate)}
-      markingType={'period'}
-      markedDates={markedDates}
-      onDayPress={(day) => onDayPress(day?.dateString)}
-      maxDate={formatDate(maxDate)}
-      minDate={formatDate(minDate)}
-      renderHeader={renderCustomHeader}
-      theme={theme}
-      futureScrollRange={futureScrollRange}
-      pastScrollRange={pastScrollRange}
-    />
-  );
-}
+    return (
+      <CalendarList
+        current={formatDate(currentDate)}
+        markingType={'period'}
+        markedDates={markedDates}
+        onDayPress={(day) => onDayPress(day?.dateString)}
+        maxDate={formatDate(maxDate)}
+        minDate={formatDate(minDate)}
+        renderHeader={renderCustomHeader}
+        theme={theme}
+        futureScrollRange={futureScrollRange}
+        pastScrollRange={pastScrollRange}
+      />
+    );
+  }
+);
 
 const theme = {
   'stylesheet': {
