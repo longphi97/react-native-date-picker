@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import DateRangePicker from 'react-native-date-picker';
+import DateRangePicker from 'react-native-date-picker-option';
 
 export default function App() {
   const [dateSelected, setDateSelected] = React.useState();

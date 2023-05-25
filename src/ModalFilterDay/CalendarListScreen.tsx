@@ -1,6 +1,6 @@
 import React, { useEffect, useState, memo, useMemo } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { CalendarList, LocaleConfig } from 'react-native-calendars';
+import { Calendar, CalendarList, LocaleConfig } from 'react-native-calendars';
 import moment from 'moment-timezone';
 
 import {
@@ -67,23 +67,29 @@ const CalenderListCustom = memo(
     );
 
     const onDayPress = (day: any) => {
+      let newStartDate = startDate;
+      let newEndDate = endDate;
+
       if (!startDate) {
-        setStartDate(day);
+        newStartDate = day;
       } else {
         if (moment(startDate).isSame(day)) {
-          setStartDate(null);
-          setEndDate(null);
+          newStartDate = null;
+          newEndDate = null;
         } else if (endDate && moment(endDate).isSame(day)) {
-          setEndDate(null);
+          newEndDate = null;
         } else {
           if (moment(startDate).isBefore(day)) {
-            setEndDate(day);
+            newEndDate = day;
           } else {
-            setEndDate(startDate);
-            setStartDate(day);
+            newEndDate = startDate;
+            newStartDate = day;
           }
         }
       }
+
+      setStartDate(newStartDate);
+      setEndDate(newEndDate);
     };
     useEffect(() => {
       if (startDate && endDate) {
@@ -113,14 +119,14 @@ const CalenderListCustom = memo(
     }, [minDate]);
 
     return (
-      <CalendarList
+      <Calendar
         current={formatDate(currentDate)}
         markingType={'period'}
         markedDates={markedDates}
         onDayPress={(day) => onDayPress(day?.dateString)}
         maxDate={formatDate(maxDate)}
         minDate={formatDate(minDate)}
-        renderHeader={renderCustomHeader}
+        // renderHeader={renderCustomHeader}
         theme={theme}
         futureScrollRange={futureScrollRange}
         pastScrollRange={pastScrollRange}
