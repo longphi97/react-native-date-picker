@@ -1,6 +1,6 @@
 import React, { useEffect, useState, memo, useMemo } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { Calendar, CalendarList, LocaleConfig } from 'react-native-calendars';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import moment from 'moment-timezone';
 
 import {
